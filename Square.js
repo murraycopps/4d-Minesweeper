@@ -1,8 +1,9 @@
 export class Square{
-    constructor(x, y, z, board){
+    constructor(x, y, z, w, board){
         this.x = x;
         this.y = y;
         this.z = z;
+        this.w = w;
         this.mine = false;
         this.checked = false;
         this.flagged = false;
@@ -22,22 +23,21 @@ export class Square{
         })
         this.element.addEventListener('mouseover', (e) => {
             if(!this.board.playing) return;
-            this.board.hover(this.x, this.y, this.z);
+            this.board.hover(this.x, this.y, this.z, this.w);
         })
     }
     check(){
         if(this.checked || this.flagged || !this.board.playing) return;
-        this.board.checkWin();
         if(this.mine){
             this.element.classList.add('mine');
-            this.element.innerText = '💣';
             this.board.lose();
         }
         this.checked = true;
         this.element.classList.add('checked');
         if(this.number === 0){
-            this.board.checkAdjacent(this.x, this.y, this.z);
+            this.board.checkAdjacent(this.x, this.y, this.z, this.w);
         }
+        this.board.checkWin();
     }
     loadMine(){
         this.number = -1;

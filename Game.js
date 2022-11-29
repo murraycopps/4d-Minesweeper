@@ -1,18 +1,21 @@
-import { ResetBanner } from "./ResetBanner.js";
-import { ThreeBoard } from "./ThreeBoard.js";
-export class Game {
-    constructor(sideLength, numMines){
+import { Board } from './Board.js';
+import {ResetScreen} from './ResetScreen.js';
+export class Game{
+    constructor(target, sideLength, numMines){
+        this.target = target;
         this.sideLength = sideLength;
         this.numMines = numMines;
-        this.board = new ThreeBoard(sideLength, numMines, this);
+        this.board = new Board(this.target, this, this.sideLength, this.numMines);
+        this.resetScreen = null;
     }
     gameOver(win){
-        console.log('game over');
-        this.ResetBanner = new ResetBanner(this, win);
+        this.board.playing = false;
+        this.resetScreen = new ResetScreen(this.target, this, win);
     }
-    reset(){
-        this.ResetBanner = null;
-        document.body.innerHTML = null
-        this.board = new ThreeBoard(this.sideLength, this.numMines, this);
+    restart(){
+        this.board.target.innerHTML = '';
+        this.board = new Board(this.target, this, this.sideLength, this.numMines);
+        this.resetScreen = null;
     }
+
 }

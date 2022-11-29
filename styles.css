@@ -1,4 +1,5 @@
-body, html{
+body,
+html {
     font-family: 'Open Sans', sans-serif;
     width: 100vw;
     height: 100vh;
@@ -9,52 +10,73 @@ body, html{
     align-items: center;
     flex-direction: column;
 }
-#game{
-    width: 100%;
-    height: 100%;
+
+#game {
     display: grid;
+    position: relative;
 }
-.board{
+
+.board {
     background: black;
     display: grid;
-    margin: 1rem;
+    margin: 1px;
 }
-.square{
+
+.square {
     background: gray;
     border: 1px solid black;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 2em;
+    font-size: 1.5em;
     color: transparent;
     user-select: none;
 }
-.checked{
+
+.checked {
     background: green;
     color: white;
 }
-.hover{
+
+.hover {
     background: rgb(129, 86, 86);
     border: 1px solid red;
 }
-.checked.hover{
+
+.checked.hover {
     background: rgb(0, 95, 0);
     border: 1px solid red;
 }
-.flagged{
+
+.flagged {
     background: red;
 }
-.mine{
+
+.mine {
     background: red !important;
 }
-.reset-banner{
-    background: black;
+
+.reset-screen {
+    background: rgba(0, 0, 0, 0.5);
     color: white;
-    font-size: 2em;
-    padding: 1rem;
-    margin: 1rem;
-    cursor: pointer;
+    font-size: 5em;
     position: absolute;
-    border: 3px solid #00FF00;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.reset-button {
+    font-size: .5em;
+    background: white;
+    color: black;
+    border: 1px solid black;
+    padding: 0.25em;
+    cursor: pointer;
+    margin-top: 1rem;
+    padding-left: 1em;
+    padding-right: 1em;
     border-radius: 50vh;
 }

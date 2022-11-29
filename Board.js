@@ -1,47 +1,42 @@
 import { Square } from './Square.js';
 export class Board {
-    constructor(sideLength = 5, numMines = 5) {
+    constructor(target, game, sideLength = 5, numMines = 5) {
+        this.game = game;
         this.sideLength = sideLength;
         this.numMines = numMines;
         this.squares = [];
-        this.parent = document.querySelector('#game');
-
-        this.parent.addEventListener('mouseover', (e) => {
+        this.target = target;
+        document.body.addEventListener('mouseover', (e) => {
             if (!e.target.classList.contains('square')) {
-                this.hover(-1, -1, -1);
+                this.hover(-1, -1, -1, -1);
             }
         })
         this.boards = []
         this.playing = true;
         for (let i = 0; i < sideLength; i++) {
             this.squares[i] = [];
-
-            //create a new board
-            let board = document.createElement('div');
-            board.classList.add('board');
-            // if (sideLength * sideLength * 50 > window.innerWidth) {
-            //     board.style.width = `${sideLength * 25}px`;
-            //     board.style.height = `${sideLength * 25}px`;
-            //     board.style.fontSize = `${.5}rem`;
-            //     this.parent.style.gridTemplateColumns = `repeat(${this.sideLength}, 1fr)`;
-            //     this.parent.style.gridTemplateRows = `repeat(${this.sideLength}, 1fr)`;
-            // }
-            // else {
-                board.style.width = `${sideLength * 50}px`;
-                board.style.height = `${sideLength * 50}px`;
-                this.parent.style.gridTemplateColumns = `repeat(${this.sideLength}, 1fr)`;
-                this.parent.style.gridTemplateRows = `repeat(1, 1fr)`;
-            // }
-            board.style.gridTemplateColumns = `repeat(${sideLength}, 1fr)`;
-            board.style.gridTemplateRows = `repeat(${sideLength}, 1fr)`;
-            this.parent.appendChild(board);
-            this.boards.push(board);
-
             for (let j = 0; j < sideLength; j++) {
-                this.squares[i][j] = [];
+                this.squares[i][j] = []
+
+                let board = document.createElement('div');
+                board.classList.add('board');
+
+                board.style.width = `${sideLength * 40}px`;
+                board.style.height = `${sideLength * 40}px`;
+                this.target.style.gridTemplateColumns = `repeat(${this.sideLength}, 1fr)`;
+                this.target.style.gridTemplateRows = `repeat(${this.sideLength}, 1fr)`;                
+
+                board.style.gridTemplateColumns = `repeat(${sideLength}, 1fr)`;
+                board.style.gridTemplateRows = `repeat(${sideLength}, 1fr)`;
+                this.target.appendChild(board);
+                this.boards.push(board);
+
                 for (let k = 0; k < sideLength; k++) {
-                    this.squares[i][j][k] = new Square(i, j, k, this);
-                    board.appendChild(this.squares[i][j][k].element);
+                    this.squares[i][j][k] = [];
+                    for (let w = 0; w < sideLength; w++) {
+                        this.squares[i][j][k][w] = new Square(i, j, k, w, this);
+                        board.appendChild(this.squares[i][j][k][w].element);
+                    }
                 }
             }
         }
@@ -51,12 +46,14 @@ export class Board {
         let x = Math.floor(Math.random() * this.sideLength);
         let y = Math.floor(Math.random() * this.sideLength);
         let z = Math.floor(Math.random() * this.sideLength);
-        while (this.squares[x][y][z].number !== 0) {
+        let w = Math.floor(Math.random() * this.sideLength);
+        while (this.squares[x][y][z][w].number !== 0) {
             x = Math.floor(Math.random() * this.sideLength);
             y = Math.floor(Math.random() * this.sideLength);
             z = Math.floor(Math.random() * this.sideLength);
+            w = Math.floor(Math.random() * this.sideLength);
         }
-        this.squares[x][y][z].check();
+        this.squares[x][y][z][w].check();
     }
     generateMines() {
         let numMines = 0;
@@ -65,47 +62,54 @@ export class Board {
             let x = Math.floor(Math.random() * this.sideLength);
             let y = Math.floor(Math.random() * this.sideLength);
             let z = Math.floor(Math.random() * this.sideLength);
-            if (!this.squares[x][y][z].mine) {
-                this.squares[x][y][z].loadMine();
-                this.mines.push(this.squares[x][y][z]);
+            let w = Math.floor(Math.random() * this.sideLength);
+            if (!this.squares[x][y][z][w].mine) {
+                this.squares[x][y][z][w].loadMine();
+                this.mines.push(this.squares[x][y][z][w]);
                 numMines++;
             }
         }
     }
     changeNumbers() {
         for (let mine of this.mines) {
-            this.changeAdjacent(mine.x, mine.y, mine.z);
+            this.changeAdjacent(mine.x, mine.y, mine.z, mine.w);
         }
     }
-    changeAdjacent(x, y, z) {
+    changeAdjacent(x, y, z, w) {
         for (let i = -1; i < 2; i++) {
             for (let j = -1; j < 2; j++) {
                 for (let k = -1; k < 2; k++) {
-                    if (this.squares[x + i] && this.squares[x + i][y + j] && this.squares[x + i][y + j][z + k] && !this.squares[x + i][y + j][z + k].mine) {
-                        this.squares[x + i][y + j][z + k].changeNumber();
-                    }
-                }
-            }
-        }
-    }
-    checkAdjacent(x, y, z) {
-        for (let i = -1; i < 2; i++) {
-            for (let j = -1; j < 2; j++) {
-                for (let k = -1; k < 2; k++) {
-                    if (x + i >= 0 && x + i < this.sideLength && y + j >= 0 && y + j < this.sideLength && z + k >= 0 && z + k < this.sideLength) {
-                        if (!this.squares[x + i][y + j][z + k].checked) {
-                            this.squares[x + i][y + j][z + k].check();
+                    for (let l = -1; l < 2; l++) {
+                        if (this.squares[x + i] && this.squares[x + i][y + j] && this.squares[x + i][y + j][z + k] && this.squares[x + i][y + j][z + k][w + l] && !this.squares[x + i][y + j][z + k][w + l].mine) {
+                            this.squares[x + i][y + j][z + k][w + l].changeNumber();
                         }
                     }
                 }
             }
         }
     }
-    hover(x, y, z) {
+    checkAdjacent(x, y, z, w) {
+        for (let i = -1; i < 2; i++) {
+            for (let j = -1; j < 2; j++) {
+                for (let k = -1; k < 2; k++) {
+                    for (let l = -1; l < 2; l++) {
+                        if (x + i >= 0 && x + i < this.sideLength && y + j >= 0 && y + j < this.sideLength && z + k >= 0 && z + k < this.sideLength && w + l >= 0 && w + l < this.sideLength) {
+                            if (!this.squares[x + i][y + j][z + k][w + l].checked) {
+                                this.squares[x + i][y + j][z + k][w + l].check();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    hover(x, y, z, w) {
         for (let i = 0; i < this.sideLength; i++) {
             for (let j = 0; j < this.sideLength; j++) {
                 for (let k = 0; k < this.sideLength; k++) {
-                    this.squares[i][j][k].element.classList.remove('hover');
+                    for (let l = 0; l < this.sideLength; l++) {
+                        this.squares[i][j][k][l].element.classList.remove('hover');
+                    }
                 }
             }
         }
@@ -113,8 +117,10 @@ export class Board {
             for (let i = -1; i < 2; i++) {
                 for (let j = -1; j < 2; j++) {
                     for (let k = -1; k < 2; k++) {
-                        if (x + i >= 0 && x + i < this.sideLength && y + j >= 0 && y + j < this.sideLength && z + k >= 0 && z + k < this.sideLength) {
-                            this.squares[x + i][y + j][z + k].element.classList.add('hover');
+                        for (let l = -1; l < 2; l++) {
+                            if (x + i >= 0 && x + i < this.sideLength && y + j >= 0 && y + j < this.sideLength && z + k >= 0 && z + k < this.sideLength && w + l >= 0 && w + l < this.sideLength) {
+                                this.squares[x + i][y + j][z + k][w + l].element.classList.add('hover');
+                            }
                         }
                     }
                 }
@@ -126,13 +132,15 @@ export class Board {
         for (let i = 0; i < this.sideLength; i++) {
             for (let j = 0; j < this.sideLength; j++) {
                 for (let k = 0; k < this.sideLength; k++) {
-                    if (this.squares[i][j][k].checked) {
-                        numChecked++;
+                    for (let l = 0; l < this.sideLength; l++) {
+                        if (this.squares[i][j][k][l].checked) {
+                            numChecked++;
+                        }
                     }
                 }
             }
         }
-        if (numChecked === this.sideLength ** 3 - 5) {
+        if (numChecked === this.sideLength ** 4 - this.numMines) {
             this.win();
         }
     }
@@ -141,27 +149,33 @@ export class Board {
         for (let i = 0; i < this.sideLength; i++) {
             for (let j = 0; j < this.sideLength; j++) {
                 for (let k = 0; k < this.sideLength; k++) {
-                    this.squares[i][j][k].element.classList.add('checked');
+                    for (let l = 0; l < this.sideLength; l++) {
+                        this.squares[i][j][k][l].element.classList.add('checked');
+                    }
                 }
             }
         }
         for (let mine of this.mines) {
             mine.element.classList.add('mine');
         }
-        this.parent.classList.add('win');
+        this.target.classList.add('win');
+        this.game.gameOver(true)
     }
     lose() {
         console.log('lose');
         for (let i = 0; i < this.sideLength; i++) {
             for (let j = 0; j < this.sideLength; j++) {
                 for (let k = 0; k < this.sideLength; k++) {
-                    this.squares[i][j][k].element.classList.add('checked');
+                    for (let l = 0; l < this.sideLength; l++) {
+                        this.squares[i][j][k][l].element.classList.add('checked');
+                    }
                 }
             }
         }
         for (let mine of this.mines) {
             mine.element.classList.add('mine');
         }
-        this.parent.classList.add('lose');
+        this.target.classList.add('lose');
+        this.game.gameOver(false)
     }
 }

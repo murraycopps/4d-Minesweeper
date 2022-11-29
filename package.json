@@ -1,8 +1,0 @@
-{
-  "dependencies": {
-    "node": "^19.1.0",
-    "three": "^0.146.0",
-    "three-orbit-controls": "^82.1.0",
-    "three-outlinepass": "^1.2.0"
-  }
-}

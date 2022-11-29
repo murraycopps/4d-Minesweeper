@@ -1,5 +1,4 @@
-import { Game } from "./Game.js";
-import { Board } from "./Board.js"
+import { Game } from "./Game.js"
 
-// const board = new Board(5);
-const game = new Game(5, 10);
+const target = document.querySelector('#game');
+const game = new Game(target, 4, 10);
